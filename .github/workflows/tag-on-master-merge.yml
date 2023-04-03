@@ -1,0 +1,52 @@
+name: Tag and Release on Master Merge
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  tag_and_release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      
+      - name: Get Version from Composer.json
+        run: echo ::set-output name=version::$(php -r "echo json_decode(file_get_contents('composer.json'), true)['version'];")
+        id: get_version
+      
+      - name: Create Git Tag
+        uses: actions/create-tag@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ steps.get_version.outputs.version }}
+          ref: ${{ github.sha }}
+          message: "Tagging commit ${{ github.sha }}"
+      
+      - name: Get Commit History
+        id: commit_history
+        uses: actions/github-script@v4
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const { data } = await github.repos.listCommits({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              sha: context.sha,
+              per_page: 100
+            })
+            return data.map(commit => commit.commit.message).join('\n')
+      
+      - name: Create GitHub Release
+        uses: actions/create-release@v1
+        if: success()
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ steps.get_version.outputs.version }}
+          release_name: "Release ${{ steps.get_version.outputs.version }}"
+          body: ${{ steps.commit_history.outputs.result }}

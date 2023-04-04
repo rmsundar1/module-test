@@ -21,4 +21,4 @@ jobs:
           tag_name: ${{ steps.get_version.outputs.version }}
           name: ${{ steps.get_version.outputs.version }}
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.REPO_GITHUB_TOKEN }}

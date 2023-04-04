@@ -13,28 +13,38 @@ jobs:
         uses: actions/checkout@v2
         with:
           fetch-depth: 0
-      
+
       - name: Get Version from Composer.json
         run: echo ::set-output name=version::$(php -r "echo json_decode(file_get_contents('composer.json'), true)['version'];")
         id: get_version
-      
+
       - name: Create Git Tag
-        uses: anothrNick/github-tag-action@v1.0.0
+        uses: anothrNick/github-tag-action@1.13.3
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tag: ${{ steps.get_version.outputs.version }}
           message: "Tagging commit ${{ github.sha }}"
       
+      - name: Get Pull Request Details
+        id: pr_details
+        uses: mxschmitt/action-tmate@v2.4.0
+        with:
+          command: |
+            echo "Pull Request: ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/pull/${GITHUB_REF/refs\/pull\//}/"
+            echo
+            gh pr view ${GITHUB_REF/refs\/pull\//} --json title,author,created_at,url,body --jq '. | "- *Title:* `\( .title )`\n  *Author:* @\( .author.login )\n  *Created at:* `\( .created_at )`\n  *URL:* \(`\( .url )`\)\n  *Body:*\n\( .body )"' --jq-raw-output
+        env:
+          TMATE_WAIT_TIME: 60
+          TMATE_SOCK: ${{ github.workspace }}/tmate.sock
+      
       - name: Create GitHub Release
-        uses: actions/create-release@v1.0.1
+        uses: softprops/action-gh-release@v1
         if: success()
+        with:
+          files: ""
+          tag_name: ${{ steps.get_version.outputs.version }}
+          name: "Release ${{ steps.get_version.outputs.version }}"
+          body: ${{ steps.pr_details.outputs.stdout }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: ${{ steps.get_version.outputs.version }}
-          release_name: Release ${{ steps.get_version.outputs.version }}
-          body: |
-            ${{ steps.drafter.outputs.changelog }}
-          draft: false
-          prerelease: false

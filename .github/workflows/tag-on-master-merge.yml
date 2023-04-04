@@ -1,6 +1,4 @@
 name: Tag and Release on Master Merge
-env:
-  ACTIONS_STEP_DEBUG: true
 
 on:
   push:

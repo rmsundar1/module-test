@@ -26,7 +26,7 @@ jobs:
 
       - name: Get Pull Request Details
         id: pr_details
-        uses: mxschmitt/action-tmate@v2.4.0
+        uses: mxschmitt/action-tmate@v3
         with:
           command: |
             echo "Pull Request: ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/pull/${GITHUB_REF/refs\/pull\//}/"
@@ -36,7 +36,7 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           tag_name: ${{ steps.get_version.outputs.version }}
-          name: Release ${{ steps.get_version.outputs.version }}
+          name: ${{ steps.get_version.outputs.version }}
           body: ${{ steps.pr_details.outputs.stdout }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

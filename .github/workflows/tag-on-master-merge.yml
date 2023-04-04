@@ -17,14 +17,7 @@ jobs:
       - name: Get Version from Composer.json
         run: echo ::set-output name=version::$(php -r "echo json_decode(file_get_contents('composer.json'), true)['version'];")
         id: get_version
-      - name: Get Pull Request Details
-        id: pr_details
-        uses: mxschmitt/action-tmate@v3
-        with:
-          command: |
-            echo "Pull Request: ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/pull/${GITHUB_REF/refs\/pull\//}/"
-            echo
-            gh pr view
+
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v1
         with:

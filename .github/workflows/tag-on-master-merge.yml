@@ -13,9 +13,11 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
-
-      - name: Get Version from Composer.json
-        run: echo ::set-env name=VERSION::$(php -r "echo json_decode(file_get_contents('composer.json'), true)['version'];")
+      - name: Set Version
+        run: echo "::set-output name=version::$(php -r "echo json_decode(file_get_contents('composer.json'), true)['version'];")"
+        id: get_version
+        env:
+          VERSION: ${{ steps.get_version.outputs.version }}
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v1

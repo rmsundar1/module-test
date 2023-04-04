@@ -16,14 +16,6 @@ jobs:
         run: echo ::set-output name=version::$(php -r "echo json_decode(file_get_contents('composer.json'), true)['version'];")
         id: get_version
 
-      - name: Create Git Tag
-        run: git tag ${{ steps.get_version.outputs.version }}
-        shell: bash
-
-      - name: Push Git Tag
-        run: git push origin ${{ steps.get_version.outputs.version }}
-        shell: bash
-
       - name: Get Pull Request Details
         id: pr_details
         uses: mxschmitt/action-tmate@v3

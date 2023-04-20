@@ -24,5 +24,6 @@ jobs:
         with:
           tag_name: ${{ env.VERSION }}
           name: ${{ env.VERSION }}
+          token: ${{ secrets.GITHUB_TOKEN }}
 #         env:
 #           GITHUB_TOKEN: ${{ secrets.REPO_GITHUB_TOKEN }}

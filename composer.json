@@ -2,7 +2,7 @@
     "name": "rmsundar1/test-play",
     "description": "Test module",
     "type": "magento2-module",
-    "version": "1.0.68",
+    "version": "1.0.9",
     "require": {
       "php": "~7.4.0 || ~8.1.0"
     },
